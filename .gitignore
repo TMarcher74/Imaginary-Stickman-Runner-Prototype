@@ -3,3 +3,6 @@
 /android/
 *.png
 *.import
+
+.vscode/*
+!.vscode/launch.json
