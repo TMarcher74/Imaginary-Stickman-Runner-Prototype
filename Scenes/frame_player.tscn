@@ -1,0 +1,62 @@
+[gd_scene load_steps=2 format=3 uid="uid://byaebv6lun4cf"]
+
+[ext_resource type="Script" path="res://Scripts/level_editor.gd" id="1_yvtm5"]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_yvtm5")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+offset_right = 81.0
+offset_bottom = 65.0
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer"]
+z_index = -1
+layout_mode = 2
+flip_h = true
+
+[node name="PreviewLine" type="Line2D" parent="HBoxContainer"]
+z_index = 1
+
+[node name="PrevGhostLine" type="Line2D" parent="HBoxContainer"]
+z_index = 1
+
+[node name="NextGhostLine" type="Line2D" parent="HBoxContainer"]
+z_index = 1
+
+[node name="CanvasLayer" type="CanvasLayer" parent="HBoxContainer"]
+
+[node name="PrevButton" type="Button" parent="HBoxContainer/CanvasLayer"]
+offset_left = 78.0
+offset_top = 511.0
+offset_right = 190.0
+offset_bottom = 616.0
+
+[node name="NextButton" type="Button" parent="HBoxContainer/CanvasLayer"]
+offset_left = 244.0
+offset_top = 512.0
+offset_right = 353.0
+offset_bottom = 618.0
+
+[node name="Label" type="Label" parent="HBoxContainer/CanvasLayer"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -148.0
+offset_bottom = 126.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 100
+text = "0"
+
+[node name="DupeButton" type="Button" parent="HBoxContainer/CanvasLayer"]
+offset_left = 990.0
+offset_top = 506.0
+offset_right = 1097.0
+offset_bottom = 607.0
+
+[node name="GayButton" type="Button" parent="HBoxContainer/CanvasLayer"]
+offset_left = 47.0
+offset_top = 41.0
+offset_right = 208.0
+offset_bottom = 104.0
+theme_override_font_sizes/font_size = 35
+text = "Straight"
