@@ -79,6 +79,12 @@ func _input(event):
             current_points = []
             save_frame_lines()
 
+            # after deletion, select the last line if there are any left
+            if all_lines_nodes.size() > 0:
+                selected_line_idx = all_lines_nodes.size() - 1
+                current_points = Array(all_lines_nodes[selected_line_idx].points)
+                highlight_selected()
+
     # tab key cycles through lines
     if event is InputEventKey and event.pressed and event.keycode == KEY_TAB:
         if all_lines_nodes.size() > 1:
@@ -87,17 +93,17 @@ func _input(event):
             highlight_selected()
 
     # clicking on a line selects it
-    # if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-    #     var mouse_pos = event.position
-    #     for i in range(all_lines_nodes.size()):
-    #         var node = all_lines_nodes[i]
-    #         for p in node.points:
-    #             if mouse_pos.distance_to(p) < 10: # if click is within 10 pixels of a point, select that line
-    #                 selected_line_idx = i
-    #                 current_points = Array(node.points)
-    #                 highlight_selected()
-    #                 print("Selected line ", i, " with points: ", current_points)
-    #                 return
+    if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+        var mouse_pos = event.position
+        for i in range(all_lines_nodes.size()):
+            var node = all_lines_nodes[i]
+            for p in node.points:
+                if mouse_pos.distance_to(p) < 10: # if click is within 10 pixels of a point, select that line
+                    selected_line_idx = i
+                    current_points = Array(node.points)
+                    highlight_selected()
+                    print("Selected line ", i, " with points: ", current_points)
+                    return
 
 func handle_input():
     if selected_line_idx==-1 or all_lines_nodes.is_empty():
@@ -133,7 +139,7 @@ func _get_center(points: Array) -> Vector2:
     return sum / points.size()
         
 func go_to_frame(n):
-    current_frame = n
+    current_frame = clamp(n, 0, frames.size() - 1)
     texture_rect.texture = frames[current_frame]
     label.text = "Frame: %d / %d" % [current_frame, frames.size() - 1]
 
@@ -224,13 +230,6 @@ func duplicate_previous():
     highlight_selected()
     save_frame_lines()
 
-func save_frame_lines():
-    var all = []
-    for node in all_lines_nodes:
-        all.append(pts_to_arr(Array(node.points)))
-    frame_floors[str(current_frame)] = all
-    save_floors()
-
 func highlight_selected():
     for i in range(all_lines_nodes.size()):
         all_lines_nodes[i].default_color = Color.YELLOW if i == selected_line_idx else Color.WHITE
@@ -264,6 +263,13 @@ func load_background():
         frames.append(load("res://background/frames/frame_%04d.png" % i))
         i += 1
     print("Loaded ", frames.size(), " frames")
+
+func save_frame_lines():
+    var all = []
+    for node in all_lines_nodes:
+        all.append(pts_to_arr(Array(node.points)))
+    frame_floors[str(current_frame)] = all
+    save_floors()
 
 func save_floors():
     var file = FileAccess.open("res://level_floors.json", FileAccess.WRITE)

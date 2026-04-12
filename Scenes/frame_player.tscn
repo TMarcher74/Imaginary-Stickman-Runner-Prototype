@@ -17,12 +17,6 @@ flip_h = true
 [node name="PreviewLine" type="Line2D" parent="HBoxContainer"]
 z_index = 1
 
-[node name="PrevGhostLine" type="Line2D" parent="HBoxContainer"]
-z_index = 1
-
-[node name="NextGhostLine" type="Line2D" parent="HBoxContainer"]
-z_index = 1
-
 [node name="CanvasLayer" type="CanvasLayer" parent="HBoxContainer"]
 
 [node name="PrevButton" type="Button" parent="HBoxContainer/CanvasLayer"]
