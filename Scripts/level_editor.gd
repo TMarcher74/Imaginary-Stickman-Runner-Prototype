@@ -150,12 +150,12 @@ func go_to_frame(n):
     # load current frame line
     if frame_floors.has(str(current_frame)) and frame_floors[str(current_frame)].size() > 0:
         for raw_line in frame_floors[str(current_frame)]:
-            var pts = arr_to_pts(raw_line)
-            add_line_node(pts)
+            var pts = arr_to_pts(raw_line["points"])
+            add_line_node(pts, raw_line["id"])
             print("Loaded floor for frame ", current_frame, ": ", pts)
 
         selected_line_idx = all_lines_nodes.size() - 1
-        current_points = arr_to_pts(frame_floors[str(current_frame)].back())
+        current_points = arr_to_pts(frame_floors[str(current_frame)].back()["points"])
         
         highlight_selected()
         
@@ -182,7 +182,7 @@ func load_ghost_line(cur_frame, offset):
             ghost.width = 5
             ghost.default_color = Color.CHARTREUSE if offset < 0 else Color.ORANGE_RED
             ghost.modulate.a = 0.5
-            ghost.points = PackedVector2Array(arr_to_pts(raw_line))
+            ghost.points = PackedVector2Array(arr_to_pts(raw_line["points"]))
             ghost.set_meta("ghost_tag", tag)
             $HBoxContainer.add_child(ghost)
         
@@ -191,8 +191,11 @@ func clear_line_nodes():
         node.queue_free()
     all_lines_nodes = []
 
-func add_line_node(points: Array) -> Line2D:
+func add_line_node(points: Array, id: int = -1) -> Line2D:
     var line = Line2D.new()
+    # if no id given, auto assign next available
+    var assigned_id = id if id != -1 else get_next_floor_id()
+    line.set_meta("floor_id", assigned_id)
     line.default_color = Color.WHITE
     line.width = 5
     line.points = PackedVector2Array(points)
@@ -207,6 +210,14 @@ func add_line_node(points: Array) -> Line2D:
     $HBoxContainer.move_child(preview_line, -1)
 
     return line
+
+func get_next_floor_id() -> int:
+    var max_id = -1
+    for key in frame_floors:
+        for line_data in frame_floors[key]:
+            if line_data["id"] > max_id:
+                max_id = line_data["id"]
+    return max_id + 1
 
 func next_frame():
     go_to_frame(current_frame + 1)
@@ -233,6 +244,9 @@ func duplicate_previous():
 func highlight_selected():
     for i in range(all_lines_nodes.size()):
         all_lines_nodes[i].default_color = Color.YELLOW if i == selected_line_idx else Color.WHITE
+    if selected_line_idx != -1:
+        var id = all_lines_nodes[selected_line_idx].get_meta("floor_id")
+        label.text = "Frame: %d / %d  |  Floor ID: %d" % [current_frame, frames.size() - 1, id]
         
 func toggle_straight_mode():
     straight_line_mode = !straight_line_mode
@@ -267,7 +281,10 @@ func load_background():
 func save_frame_lines():
     var all = []
     for node in all_lines_nodes:
-        all.append(pts_to_arr(Array(node.points)))
+        all.append({
+            "id": node.get_meta("floor_id"),
+            "points": pts_to_arr(Array(node.points))
+        })
     frame_floors[str(current_frame)] = all
     save_floors()
 
@@ -279,5 +296,15 @@ func load_floors():
     if FileAccess.file_exists("res://level_floors.json"):
         var file = FileAccess.open("res://level_floors.json", FileAccess.READ)
         frame_floors = JSON.parse_string(file.get_as_text())
+        var data = frame_floors
+        for key in data:
+            var lines = data[key]
+            # Use for migrating old format where lines were just arrays of points without IDs
+            if lines.size() > 0 and lines[0] is Array:
+                var migrated = []
+                for i in range(lines.size()):
+                    migrated.append({"id": i, "points": lines[i]})
+                data[key] = migrated
+        frame_floors = data
         if frame_floors is not Dictionary:
             frame_floors = {}
