@@ -20,37 +20,60 @@ z_index = 1
 [node name="CanvasLayer" type="CanvasLayer" parent="HBoxContainer"]
 
 [node name="PrevButton" type="Button" parent="HBoxContainer/CanvasLayer"]
-offset_left = 78.0
-offset_top = 511.0
-offset_right = 190.0
-offset_bottom = 616.0
+offset_left = 51.0
+offset_top = 500.0
+offset_right = 143.0
+offset_bottom = 589.0
+theme_override_font_sizes/font_size = 30
+text = "<"
 
 [node name="NextButton" type="Button" parent="HBoxContainer/CanvasLayer"]
-offset_left = 244.0
-offset_top = 512.0
-offset_right = 353.0
-offset_bottom = 618.0
+offset_left = 194.0
+offset_top = 498.0
+offset_right = 285.0
+offset_bottom = 590.0
+theme_override_font_sizes/font_size = 30
+text = ">"
 
 [node name="Label" type="Label" parent="HBoxContainer/CanvasLayer"]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -148.0
-offset_bottom = 126.0
+offset_left = -330.0
+offset_top = 22.0
+offset_right = -11.0
+offset_bottom = 114.0
 grow_horizontal = 0
-theme_override_font_sizes/font_size = 100
-text = "0"
+theme_override_font_sizes/font_size = 65
+text = "Floor data"
 
 [node name="DupeButton" type="Button" parent="HBoxContainer/CanvasLayer"]
-offset_left = 990.0
-offset_top = 506.0
-offset_right = 1097.0
-offset_bottom = 607.0
+offset_left = 952.0
+offset_top = 504.0
+offset_right = 1089.0
+offset_bottom = 580.0
+theme_override_font_sizes/font_size = 25
+text = "Dupelicate"
 
 [node name="GayButton" type="Button" parent="HBoxContainer/CanvasLayer"]
-offset_left = 47.0
-offset_top = 41.0
-offset_right = 208.0
-offset_bottom = 104.0
+offset_left = 33.0
+offset_top = 30.0
+offset_right = 194.0
+offset_bottom = 93.0
 theme_override_font_sizes/font_size = 35
 text = "Straight"
+
+[node name="IDSpinBox" type="SpinBox" parent="HBoxContainer/CanvasLayer"]
+offset_left = 952.0
+offset_top = 122.0
+offset_right = 1035.06
+offset_bottom = 153.0
+scale = Vector2(2, 2)
+
+[node name="SetIDButton" type="Button" parent="HBoxContainer/CanvasLayer"]
+offset_left = 963.0
+offset_top = 205.0
+offset_right = 1074.0
+offset_bottom = 250.0
+theme_override_font_sizes/font_size = 25
+text = "Set ID"

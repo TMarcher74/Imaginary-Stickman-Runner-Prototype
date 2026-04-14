@@ -21,6 +21,7 @@ var fps = 10 # how many frames per second the editor runs at
 @onready var texture_rect = $HBoxContainer/TextureRect
 @onready var label = $HBoxContainer/CanvasLayer/Label
 @onready var preview_line = $HBoxContainer/PreviewLine
+@onready var id_spin_box = $HBoxContainer/CanvasLayer/IDSpinBox
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -92,22 +93,10 @@ func _input(event):
             current_points = Array(all_lines_nodes[selected_line_idx].points)
             highlight_selected()
 
-    # clicking on a line selects it
-    if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-        var mouse_pos = event.position
-        for i in range(all_lines_nodes.size()):
-            var node = all_lines_nodes[i]
-            for p in node.points:
-                if mouse_pos.distance_to(p) < 10: # if click is within 10 pixels of a point, select that line
-                    selected_line_idx = i
-                    current_points = Array(node.points)
-                    highlight_selected()
-                    print("Selected line ", i, " with points: ", current_points)
-                    return
-
 func handle_input():
     if selected_line_idx==-1 or all_lines_nodes.is_empty():
         return
+
     var node = all_lines_nodes[selected_line_idx]
     current_points = Array(node.points)
     var moved = false
@@ -141,7 +130,6 @@ func _get_center(points: Array) -> Vector2:
 func go_to_frame(n):
     current_frame = clamp(n, 0, frames.size() - 1)
     texture_rect.texture = frames[current_frame]
-    label.text = "Frame: %d / %d" % [current_frame, frames.size() - 1]
 
     clear_line_nodes()
     selected_line_idx = -1
@@ -211,6 +199,14 @@ func add_line_node(points: Array, id: int = -1) -> Line2D:
 
     return line
 
+func set_selected_id():
+    if selected_line_idx == -1:
+        return
+    var new_id = int(id_spin_box.value)
+    all_lines_nodes[selected_line_idx].set_meta("floor_id", new_id)
+    save_frame_lines()
+    highlight_selected()
+
 func get_next_floor_id() -> int:
     var max_id = -1
     for key in frame_floors:
@@ -246,6 +242,7 @@ func highlight_selected():
         all_lines_nodes[i].default_color = Color.YELLOW if i == selected_line_idx else Color.WHITE
     if selected_line_idx != -1:
         var id = all_lines_nodes[selected_line_idx].get_meta("floor_id")
+        id_spin_box.value = id
         label.text = "Frame: %d / %d  |  Floor ID: %d" % [current_frame, frames.size() - 1, id]
         
 func toggle_straight_mode():
@@ -270,6 +267,7 @@ func connect_buttons():
     $HBoxContainer/CanvasLayer/NextButton.pressed.connect(next_frame)
     $HBoxContainer/CanvasLayer/DupeButton.pressed.connect(duplicate_previous)
     $HBoxContainer/CanvasLayer/GayButton.pressed.connect(toggle_straight_mode)
+    $HBoxContainer/CanvasLayer/SetIDButton.pressed.connect(set_selected_id)
 
 func load_background():
     var i = 1
@@ -296,15 +294,5 @@ func load_floors():
     if FileAccess.file_exists("res://level_floors.json"):
         var file = FileAccess.open("res://level_floors.json", FileAccess.READ)
         frame_floors = JSON.parse_string(file.get_as_text())
-        var data = frame_floors
-        for key in data:
-            var lines = data[key]
-            # Use for migrating old format where lines were just arrays of points without IDs
-            if lines.size() > 0 and lines[0] is Array:
-                var migrated = []
-                for i in range(lines.size()):
-                    migrated.append({"id": i, "points": lines[i]})
-                data[key] = migrated
-        frame_floors = data
         if frame_floors is not Dictionary:
             frame_floors = {}
