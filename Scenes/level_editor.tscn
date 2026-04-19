@@ -1,9 +1,9 @@
 [gd_scene load_steps=2 format=3 uid="uid://byaebv6lun4cf"]
 
-[ext_resource type="Script" path="res://Scripts/level_editor.gd" id="1_yvtm5"]
+[ext_resource type="Script" path="res://Scripts/level_editor.gd" id="1_y3744"]
 
 [node name="Node2D" type="Node2D"]
-script = ExtResource("1_yvtm5")
+script = ExtResource("1_y3744")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 offset_right = 81.0
@@ -20,18 +20,26 @@ z_index = 1
 [node name="CanvasLayer" type="CanvasLayer" parent="HBoxContainer"]
 
 [node name="PrevButton" type="Button" parent="HBoxContainer/CanvasLayer"]
-offset_left = 51.0
-offset_top = 500.0
-offset_right = 143.0
-offset_bottom = 589.0
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 55.0
+offset_top = -148.0
+offset_right = 147.0
+offset_bottom = -59.0
+grow_vertical = 0
 theme_override_font_sizes/font_size = 30
 text = "<"
 
 [node name="NextButton" type="Button" parent="HBoxContainer/CanvasLayer"]
-offset_left = 194.0
-offset_top = 498.0
-offset_right = 285.0
-offset_bottom = 590.0
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 180.0
+offset_top = -152.0
+offset_right = 271.0
+offset_bottom = -60.0
+grow_vertical = 0
 theme_override_font_sizes/font_size = 30
 text = ">"
 
@@ -48,10 +56,17 @@ theme_override_font_sizes/font_size = 65
 text = "Floor data"
 
 [node name="DupeButton" type="Button" parent="HBoxContainer/CanvasLayer"]
-offset_left = 952.0
-offset_top = 504.0
-offset_right = 1089.0
-offset_bottom = 580.0
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -205.0
+offset_top = -142.0
+offset_right = -68.0
+offset_bottom = -66.0
+grow_horizontal = 0
+grow_vertical = 0
 theme_override_font_sizes/font_size = 25
 text = "Dupelicate"
 
@@ -64,16 +79,30 @@ theme_override_font_sizes/font_size = 35
 text = "Straight"
 
 [node name="IDSpinBox" type="SpinBox" parent="HBoxContainer/CanvasLayer"]
-offset_left = 952.0
-offset_top = 122.0
-offset_right = 1035.06
-offset_bottom = 153.0
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -217.0
+offset_top = -204.0
+offset_right = -133.938
+offset_bottom = -173.0
+grow_horizontal = 0
+grow_vertical = 2
 scale = Vector2(2, 2)
 
 [node name="SetIDButton" type="Button" parent="HBoxContainer/CanvasLayer"]
-offset_left = 963.0
-offset_top = 205.0
-offset_right = 1074.0
-offset_bottom = 250.0
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -209.0
+offset_top = -124.0
+offset_right = -98.0
+offset_bottom = -79.0
+grow_horizontal = 0
+grow_vertical = 2
 theme_override_font_sizes/font_size = 25
 text = "Set ID"
