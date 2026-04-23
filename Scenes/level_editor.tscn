@@ -68,7 +68,7 @@ offset_bottom = -66.0
 grow_horizontal = 0
 grow_vertical = 0
 theme_override_font_sizes/font_size = 25
-text = "Dupelicate"
+text = "Duplicate"
 
 [node name="GayButton" type="Button" parent="HBoxContainer/CanvasLayer"]
 offset_left = 33.0
@@ -106,3 +106,20 @@ grow_horizontal = 0
 grow_vertical = 2
 theme_override_font_sizes/font_size = 25
 text = "Set ID"
+
+[node name="Green" type="CheckButton" parent="HBoxContainer/CanvasLayer"]
+offset_left = 923.0
+offset_top = 288.0
+offset_right = 1019.0
+offset_bottom = 319.0
+scale = Vector2(2, 2)
+text = "Green"
+
+[node name="Red" type="CheckButton" parent="HBoxContainer/CanvasLayer"]
+offset_left = 959.0
+offset_top = 340.0
+offset_right = 1037.0
+offset_bottom = 371.0
+scale = Vector2(2, 2)
+text = "Red
+"
