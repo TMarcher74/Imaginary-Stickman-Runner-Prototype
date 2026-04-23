@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://nqsmukpbamiq"]
+[gd_scene load_steps=3 format=3 uid="uid://nqsmukpbamiq"]
 
 [ext_resource type="Script" path="res://Scripts/game.gd" id="1_pr1it"]
+[ext_resource type="Texture2D" uid="uid://c0vt1oui33e6d" path="res://Assets/stickman.png" id="2_reikt"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_pr1it")
@@ -11,3 +12,12 @@ offset_bottom = 649.0
 flip_h = true
 
 [node name="Node2D" type="Node2D" parent="."]
+
+[node name="Player" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
+position = Vector2(0, -1.21623)
+scale = Vector2(0.226563, 0.273568)
+texture = ExtResource("2_reikt")
+centered = false
+offset = Vector2(0, -427.115)
