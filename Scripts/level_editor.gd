@@ -36,11 +36,11 @@ func _process(delta: float) -> void:
 
 	handle_input()
 
-func _input(event):
-	# if mouse is over any Control node (buttons etc), skip
-	if get_viewport().gui_get_hovered_control() is Button:
-		return
-
+func _unhandled_input(event: InputEvent) -> void:
+	"""
+	This function only runs if the UI (Buttons, SpinBox) didn't consume the input event. 
+	Allowing us to use the same keys for both UI interaction and line manipulation without conflicts.
+	"""
 	# left mouse button starts/stops drawing, mouse motion adds points to current line
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
@@ -71,6 +71,7 @@ func _input(event):
 
 		preview_line.points = PackedVector2Array(current_points)
 
+func _input(event: InputEvent) -> void:
 	# delete key deletes selected line
 	if event is InputEventKey and event.pressed and event.keycode == KEY_DELETE:
 		if selected_line_idx != -1:
