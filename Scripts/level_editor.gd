@@ -133,6 +133,7 @@ func go_to_frame(n):
 	texture_rect.texture = frames[current_frame]
 
 	clear_line_nodes()
+	clear_ghost_lines()
 	selected_line_idx = -1
 	current_points = []
 	
@@ -149,8 +150,10 @@ func go_to_frame(n):
 		highlight_selected()
 		
 	# load ghost of previous and next frame
-	load_ghost_line(current_frame, -1)
-	load_ghost_line(current_frame, +1)
+	if $HBoxContainer/CanvasLayer/Green.button_pressed:
+		load_ghost_line(current_frame, -1)
+	if $HBoxContainer/CanvasLayer/Red.button_pressed:
+		load_ghost_line(current_frame, +1)
 
 func load_ghost_line(cur_frame, offset):
 	var valid = false
@@ -179,6 +182,11 @@ func clear_line_nodes():
 	for node in all_lines_nodes:
 		node.queue_free()
 	all_lines_nodes = []
+
+func clear_ghost_lines():
+	for child in $HBoxContainer.get_children():
+		if child.get_meta("ghost_tag", "") != "":
+			child.queue_free()
 
 func add_line_node(points: Array, id: int = -1) -> Line2D:
 	var line = Line2D.new()
