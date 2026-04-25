@@ -30,23 +30,19 @@ func _ready():
 		
 func _process(delta):
 	timer += delta
-	if timer >= 1.0 / fps:
+	if timer >= 100.0 / fps:
 		timer = 0.0
 		current_frame = (current_frame + 1) % frames.size()
 		texture_rect.texture = frames[current_frame]
 		load_floor(current_frame)
-
-	target_y = get_floor_y_at(current_floor_id, current_frame, player_x)
-    # only update target if it moved meaningfully
-	# if abs(new_target - target_y) > 1.0:
-	# 	target_y = new_target
+		target_y = get_floor_y_at(current_floor_id, current_frame, player_x)
 
 	#lerp player y position to floor
-	# player_y = lerp(player_y, target_y, delta * smoothing)
+	player_y = lerp(player_y, target_y, delta * smoothing)
 	player.position.y = target_y
 
 	# skew player based on floor angle
-	# var angle = clamp(get_floor_angle(current_floor_id, current_frame, player_x), -0.3, 0.3)
+	# var angle = clamp(get_floor_angle(current_floor_id, current_frame, player_x), -0.1, 0.1)
 	# sprite.rotation = lerp_angle(sprite.rotation, angle, delta * smoothing)
 
 	debug_label.text = """
@@ -127,6 +123,8 @@ func get_floor_y_at(floor_id, frame_num, x_pos) -> float:
 			continue
 
 		var pts = arr_to_pts(line_data["points"])
+		pts.sort_custom(func(a, b): return a.x < b.x)
+
 		if pts.size() < 2:				# if only one point, return its Y; if no points, return current player Y
 			return pts[0].y if pts.size() == 1 else last_valid_y	
 
@@ -135,7 +133,8 @@ func get_floor_y_at(floor_id, frame_num, x_pos) -> float:
 			var b = pts[i + 1]
 			if x_pos >= a.x and x_pos <= b.x:
 				var t = (x_pos - a.x) / (b.x - a.x)
-				return lerp(a.y, b.y, t)		# linear interpolation between a and b based on x_pos
+				last_valid_y = lerp(a.y, b.y, t)
+				return last_valid_y				# linear interpolation between a and b based on x_pos
 		if x_pos < pts[0].x:
 			last_valid_y = pts[0].y
 			return last_valid_y					# if player is left of the first point, return Y of first point			
