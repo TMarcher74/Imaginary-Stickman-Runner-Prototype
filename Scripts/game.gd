@@ -4,6 +4,7 @@ extends Node
 @onready var floor_container = $Node2D
 @onready var player = $Player
 @onready var sprite = $Player/Sprite2D
+@onready var debug_label = $CanvasLayer/DebugLabel
 
 var frames = []
 var frame_floors = {}
@@ -47,6 +48,16 @@ func _process(delta):
 	# skew player based on floor angle
 	# var angle = clamp(get_floor_angle(current_floor_id, current_frame, player_x), -0.3, 0.3)
 	# sprite.rotation = lerp_angle(sprite.rotation, angle, delta * smoothing)
+
+	debug_label.text = """
+	frame: %d
+	floor_id: %d
+	player_x: %.1f
+	player_y: %.1f
+	target_y: %.1f
+	last_valid_y: %.1f
+	angle: %.3f
+	"""%[current_frame, current_floor_id, player_x, player_y, target_y, last_valid_y, sprite.rotation]
 
 func _input(event):
 	if input_locked:

@@ -21,3 +21,9 @@ scale = Vector2(0.226563, 0.273568)
 texture = ExtResource("2_reikt")
 centered = false
 offset = Vector2(0, -427.115)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="DebugLabel" type="Label" parent="CanvasLayer"]
+offset_right = 40.0
+offset_bottom = 23.0
