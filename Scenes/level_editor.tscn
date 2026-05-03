@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://byaebv6lun4cf"]
+[gd_scene load_steps=3 format=3 uid="uid://byaebv6lun4cf"]
 
 [ext_resource type="Script" path="res://Scripts/level_editor.gd" id="1_y3744"]
+[ext_resource type="Texture2D" uid="uid://c0vt1oui33e6d" path="res://Assets/stickman.png" id="2_fvask"]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_y3744")
@@ -44,16 +45,13 @@ theme_override_font_sizes/font_size = 30
 text = ">"
 
 [node name="Label" type="Label" parent="HBoxContainer/CanvasLayer"]
-anchors_preset = 1
-anchor_left = 1.0
+anchors_preset = 10
 anchor_right = 1.0
-offset_left = -330.0
-offset_top = 22.0
-offset_right = -11.0
-offset_bottom = 114.0
-grow_horizontal = 0
-theme_override_font_sizes/font_size = 65
+offset_bottom = 90.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 40
 text = "Floor data"
+horizontal_alignment = 2
 
 [node name="DupeButton" type="Button" parent="HBoxContainer/CanvasLayer"]
 anchors_preset = 3
@@ -84,13 +82,28 @@ anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -217.0
+offset_left = -333.0
 offset_top = -204.0
-offset_right = -133.938
+offset_right = -249.938
 offset_bottom = -173.0
 grow_horizontal = 0
 grow_vertical = 2
-scale = Vector2(2, 2)
+scale = Vector2(1.75, 1.75)
+
+[node name="ScaleSpinBox" type="SpinBox" parent="HBoxContainer/CanvasLayer"]
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -174.0
+offset_top = -204.0
+offset_right = -90.9375
+offset_bottom = -173.0
+grow_horizontal = 0
+grow_vertical = 2
+scale = Vector2(1.75, 1.75)
+step = 0.01
 
 [node name="SetIDButton" type="Button" parent="HBoxContainer/CanvasLayer"]
 anchors_preset = 6
@@ -98,28 +111,67 @@ anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -209.0
-offset_top = -124.0
-offset_right = -98.0
-offset_bottom = -79.0
+offset_left = -327.0
+offset_top = -129.0
+offset_right = -216.0
+offset_bottom = -84.0
 grow_horizontal = 0
 grow_vertical = 2
 theme_override_font_sizes/font_size = 25
 text = "Set ID"
 
+[node name="SetScaleButton" type="Button" parent="HBoxContainer/CanvasLayer"]
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -170.0
+offset_top = -128.0
+offset_right = -57.0
+offset_bottom = -83.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_font_sizes/font_size = 25
+text = "Set scale"
+
+[node name="SetScaleToAllButton" type="Button" parent="HBoxContainer/CanvasLayer"]
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -179.0
+offset_top = -68.0
+offset_bottom = -23.0
+grow_horizontal = 0
+grow_vertical = 2
+scale = Vector2(0.75, 0.75)
+theme_override_font_sizes/font_size = 25
+text = "Set scale to all"
+
 [node name="Green" type="CheckButton" parent="HBoxContainer/CanvasLayer"]
-offset_left = 923.0
-offset_top = 288.0
-offset_right = 1019.0
-offset_bottom = 319.0
+offset_left = 906.0
+offset_top = 365.0
+offset_right = 1002.0
+offset_bottom = 396.0
 scale = Vector2(2, 2)
 text = "Green"
 
 [node name="Red" type="CheckButton" parent="HBoxContainer/CanvasLayer"]
-offset_left = 959.0
-offset_top = 340.0
-offset_right = 1037.0
-offset_bottom = 371.0
+offset_left = 942.0
+offset_top = 417.0
+offset_right = 1020.0
+offset_bottom = 448.0
 scale = Vector2(2, 2)
 text = "Red
 "
+
+[node name="Player" type="Node2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
+position = Vector2(0, -1.21623)
+scale = Vector2(0.226563, 0.273568)
+texture = ExtResource("2_fvask")
+centered = false
+offset = Vector2(0, -427.115)
