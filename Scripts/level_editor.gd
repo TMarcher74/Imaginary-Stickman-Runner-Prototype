@@ -17,11 +17,19 @@ var rotate_speed = 0.005 # how fast the line rotates when using Q/E
 
 var fps = 10 # how many frames per second the editor runs at
 
+# player
+var player_x = 200.0
+var player_y = 400.0
+var player_scale = 1.0
+var target_scale = 1.0
 
 @onready var texture_rect = $HBoxContainer/TextureRect
 @onready var label = $HBoxContainer/CanvasLayer/Label
 @onready var preview_line = $HBoxContainer/PreviewLine
 @onready var id_spin_box = $HBoxContainer/CanvasLayer/IDSpinBox
+@onready var scale_spinbox = $HBoxContainer/CanvasLayer/ScaleSpinBox
+@onready var player = $Player
+@onready var sprite = $Player/Sprite2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -30,11 +38,28 @@ func _ready() -> void:
 	load_floors()
 	go_to_frame(0)
 	connect_buttons()
+	player.position.x = player_x
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-
 	handle_input()
+	
+	# snap player to selected floor
+	if selected_line_idx != -1 and not all_lines_nodes.is_empty():
+		var selected_node = all_lines_nodes[selected_line_idx]
+		var floor_id = selected_node.get_meta("floor_id")
+		var floor_y = get_floor_y_at(floor_id, current_frame, player.position.x)
+		player.position.y = floor_y
+
+		# scale
+		target_scale = selected_node.get_meta("floor_scale", 1.0)
+		player_scale = lerp(player_scale, target_scale, delta * 15.0)
+		player.scale = Vector2(player_scale, player_scale)
+
+		# skew player based on floor angle
+		# var angle = clamp(get_floor_angle(selected_line_idx, current_frame, player_x), -45.0, 45.0)
+		var angle = get_floor_angle(selected_line_idx, current_frame, player_x)
+		sprite.rotation = lerp_angle(sprite.rotation, angle, delta * 15.0)
 
 func _unhandled_input(event: InputEvent) -> void:
 	"""
@@ -136,12 +161,13 @@ func go_to_frame(n):
 	clear_ghost_lines()
 	selected_line_idx = -1
 	current_points = []
-	
+
 	# load current frame line
 	if frame_floors.has(str(current_frame)) and frame_floors[str(current_frame)].size() > 0:
 		for raw_line in frame_floors[str(current_frame)]:
 			var pts = arr_to_pts(raw_line["points"])
-			add_line_node(pts, raw_line["id"])
+			var scale = raw_line.get("scale", 1.0)
+			add_line_node(pts, raw_line["id"], scale)
 			print("Loaded floor for frame ", current_frame, ": ", pts)
 
 		selected_line_idx = all_lines_nodes.size() - 1
@@ -188,11 +214,12 @@ func clear_ghost_lines():
 		if child.get_meta("ghost_tag", "") != "":
 			child.queue_free()
 
-func add_line_node(points: Array, id: int = -1) -> Line2D:
+func add_line_node(points: Array, id: int = -1, floor_scale: float = 1.0) -> Line2D:
 	var line = Line2D.new()
 	# if no id given, auto assign next available
 	var assigned_id = id if id != -1 else get_next_floor_id()
 	line.set_meta("floor_id", assigned_id)
+	line.set_meta("floor_scale", floor_scale)
 	line.default_color = Color.WHITE
 	line.width = 5
 	line.points = PackedVector2Array(points)
@@ -216,6 +243,13 @@ func set_selected_id():
 	save_frame_lines()
 	highlight_selected()
 
+func set_selected_scale():
+	if selected_line_idx == -1:
+		return
+	var new_scale = scale_spinbox.value
+	all_lines_nodes[selected_line_idx].set_meta("floor_scale", new_scale)
+	save_frame_lines()
+
 func get_next_floor_id() -> int:
 	var max_id = -1
 	for key in frame_floors:
@@ -223,6 +257,83 @@ func get_next_floor_id() -> int:
 			if line_data["id"] > max_id:
 				max_id = line_data["id"]
 	return max_id + 1
+
+func get_floor_scale(floor_id, frame_num) -> float:
+	if not frame_floors.has(str(frame_num)):
+		return player_scale
+	for line_data in frame_floors[str(frame_num)]:
+		if line_data["id"] == floor_id:
+			return line_data.get("scale", 1.0)
+	return player_scale
+
+func get_floor_y_at(floor_id, frame_num, x_pos) -> float:
+	"""
+	Get the Y position of the floor with the given ID at the given X position for the specified frame
+	"""
+	if not frame_floors.has(str(frame_num)):
+		return player.position.y
+
+	for line_data in frame_floors[str(frame_num)]:
+		if line_data["id"] != floor_id:
+			continue
+
+		var pts = arr_to_pts(line_data["points"])
+		pts.sort_custom(func(a, b): return a.x < b.x)
+
+		if pts.size() < 2:				# if only one point, return its Y; if no points, return current player Y
+			return pts[0].y if pts.size() == 1 else player.position.y
+
+		for i in range(pts.size() - 1):
+			var a = pts[i]
+			var b = pts[i + 1]
+			if x_pos >= a.x and x_pos <= b.x:
+				var t = (x_pos - a.x) / (b.x - a.x)
+				return lerp(a.y, b.y, t)		# linear interpolation between a and b based on x_pos
+		if x_pos < pts[0].x:
+			return pts[0].y						# if player is left of the first point, return Y of first point			
+		return pts[pts.size() - 1].y			# if player is right of the last point, return Y of last point
+	return player.position.y					# if floor ID not found, return last valid Y to avoid sudden drops					
+
+func get_floor_angle(floor_id, frame_num, x_pos) -> float:
+	"""
+	Get the angle of the floor with the given ID at the given X position for the specified frame
+	"""
+	if not frame_floors.has(str(frame_num)):
+		return 0.0
+
+	for line_data in frame_floors[str(frame_num)]:
+		if line_data["id"] != floor_id:
+			continue
+
+		var pts = arr_to_pts(line_data["points"])
+		pts.sort_custom(func(a, b): return a.x < b.x)
+
+		if pts.size() < 2:
+			return 0.0									# if less than 2 points, return 0 angle
+		for i in range(pts.size() - 1):
+			var a = pts[i]
+			var b = pts[i + 1]
+			if x_pos >= a.x and x_pos <= b.x:
+				return (b - a).angle()					# angle of the segment between points a and b
+		if x_pos < pts[0].x:
+			return (pts[1] - pts[0]).angle()			# if player is left of the first point, return angle of first segment
+		var last = pts.size() - 1
+		return (pts[last] - pts[last - 1]).angle()		# if player is right of the last point, return angle of last segment
+	return 0.0											# if floor ID not found, return 0 angle to avoid skewing
+
+func apply_scale_to_all_frames():
+	if selected_line_idx == -1:
+		return
+	var floor_id = all_lines_nodes[selected_line_idx].get_meta("floor_id")
+	var floor_scale = all_lines_nodes[selected_line_idx].get_meta("floor_scale", 1.0)
+
+	for key in frame_floors:
+		for line_data in frame_floors[key]:
+			if line_data["id"] == floor_id:
+				line_data["scale"] = floor_scale
+
+	save_floors()
+	print("Applied scale ", floor_scale, " to all frames for floor ID ", floor_id)
 
 func next_frame():
 	go_to_frame(current_frame + 1)
@@ -250,9 +361,9 @@ func highlight_selected():
 	for i in range(all_lines_nodes.size()):
 		all_lines_nodes[i].default_color = Color.YELLOW if i == selected_line_idx else Color.WHITE
 	if selected_line_idx != -1:
-		var id = all_lines_nodes[selected_line_idx].get_meta("floor_id")
-		id_spin_box.value = id
-		label.text = "Frame: %d / %d  |  Floor ID: %d" % [current_frame, frames.size() - 1, id]
+		id_spin_box.value = all_lines_nodes[selected_line_idx].get_meta("floor_id")
+		scale_spinbox.value = all_lines_nodes[selected_line_idx].get_meta("floor_scale", 1.0)
+		label.text = "Frame: %d / %d  |  Floor ID: %d | Floor Scale: %d" % [current_frame, frames.size() - 1, id_spin_box.value, scale_spinbox.value]
 		
 func toggle_straight_mode():
 	straight_line_mode = !straight_line_mode
@@ -277,6 +388,8 @@ func connect_buttons():
 	$HBoxContainer/CanvasLayer/DupeButton.pressed.connect(duplicate_previous)
 	$HBoxContainer/CanvasLayer/GayButton.pressed.connect(toggle_straight_mode)
 	$HBoxContainer/CanvasLayer/SetIDButton.pressed.connect(set_selected_id)
+	$HBoxContainer/CanvasLayer/SetScaleButton.pressed.connect(set_selected_scale)
+	$HBoxContainer/CanvasLayer/SetScaleToAllButton.pressed.connect(apply_scale_to_all_frames)
 
 func load_background():
 	var i = 1
@@ -290,6 +403,7 @@ func save_frame_lines():
 	for node in all_lines_nodes:
 		all.append({
 			"id": node.get_meta("floor_id"),
+			"scale": node.get_meta("floor_scale", 1.0),
 			"points": pts_to_arr(Array(node.points))
 		})
 	frame_floors[str(current_frame)] = all
